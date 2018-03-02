@@ -1,0 +1,14 @@
+{
+  "name": "lazy-load-picture",
+  "version": "1.0.0",
+  "description": "懒加载主要目的作为服务器前端的优化,减少请求数或延迟请求数\r img的src属性指向服务器地址，当浏览器从上往下读取到src的地址时，就会加载图片",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.0.1"
+  }
+}
