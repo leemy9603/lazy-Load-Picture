@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>可视区加载</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <style type="text/css">
+    	.main {
+    		height: 600px;
+    		overflow: scroll;
+    		width: 100%;
+    		background:#000;
+    	}
+    	.pic {
+    		width: 250px;
+    		height: 250px;
+    		background: #fff;
+    		margin: 0 auto;
+    		margin-bottom: 20px;
+    	}
+    	.pic img{
+    		display: block;
+    		height: 250px;
+    		width: 250px;
+    	}
+    </style>
+</head>
+<body>
+	<div class="main">
+	</div>
+</body>
+<script type="text/javascript">
+	var picArr = []
+	var main = document.querySelector(".main");
+	//步骤一:创建异步对象
+var ajax = new XMLHttpRequest();
+//步骤二:设置请求的url参数,参数一是请求的类型,参数二是请求的url,可以带参数,动态的传递参数starName到服务端
+ajax.open('get','http://localhost:3000/lazyLoad/index/selectPic');
+//步骤三:发送请求
+ajax.send();
+//步骤四:注册事件 onreadystatechange 状态改变就会调用
+ajax.onreadystatechange = function () {
+   if (ajax.readyState==4 &&ajax.status==200) {
+    //步骤五 如果能够进到这个判断 说明 数据 完美的回来了,并且请求的页面是存在的
+　　　　console.log(ajax.responseText);//输入相应的内容
+		picArr = JSON.parse(ajax.responseText)
+		//将img样式先渲染到页面
+		if(picArr.length > 0) {
+			var inner = ""
+			for(var i = 0;i<picArr.length;i++){
+				inner += '<div class="pic">'+
+				 	'<img  data-picurl='+picArr[i].purl+">"+
+				 '</div>'
+			}
+			main.innerHTML = inner  
+		}
+		  	var imgArr = document.getElementsByTagName("img")
+		  	loadImg(imgArr)
+		  // 	main.onscroll = function(){//
+		  // 		console.log('1')
+		  // 		loadImg(imgArr)
+
+		  // }
+		  // window.addEventListener('scroll',throttle(loadImg,500,1000));
+		  main.onscroll = function(){
+		  	console.log('1')
+		  	// throttle(loadImg(imgArr),500,1000)
+		  	loadImg(imgArr)
+		  }
+  　　}
+}
+
+
+ function loadImg(arr) {//懒加载图片
+  for(var i = 0, len = arr.length; i < len; i++) {
+   if(arr[i].getBoundingClientRect().top < document.documentElement.clientHeight && !arr[i].isLoad) {
+   arr[i].isLoad = true; //图片显示标志位
+   //arr[i].style.cssText = "opacity: 0;"; 
+   (function(i) {
+    setTimeout(function() {
+    if(arr[i].dataset) { //兼容不支持data的浏览器
+     aftLoadImg(arr[i], arr[i].dataset.picurl);
+    } else {
+     aftLoadImg(arr[i], arr[i].getAttribute("data-picurl"));
+    }
+    arr[i].style.cssText = "transition: 1s; opacity: 1;" //相当于fadein
+    }, 500)
+   })(i);
+   }
+  }
+  }
+
+  function aftLoadImg(obj, url) {
+  	var oImg = new Image();
+  	oImg.onload = function() {
+  		obj.src = oImg.src; //下载完成后将该图片赋给目标obj目标对象
+  	}
+  	oImg.src = url; //oImg对象先下载该图像
+  }
+
+
+//   // 简单的节流函数
+// //fun 要执行的函数
+// //delay 延迟
+// //time  在time时间内必须执行一次
+// function throttle(fun, delay, time) {
+//     var timeout,
+//         startTime = new Date();
+//     return function() {
+//         var context = this,
+//             args = arguments,
+//             curTime = new Date();
+//         clearTimeout(timeout);
+//         // 如果达到了规定的触发时间间隔，触发 handler
+//         if (curTime - startTime >= time) {
+//             fun.apply(context, args);
+//             startTime = curTime;
+//             // 没达到触发间隔，重新设定定时器
+//         } else {
+//             timeout = setTimeout(fun, delay);
+//         }
+//     };
+// };
+// // 实际想绑定在 scroll 事件上的 handler
+// function loadImg(event) {}
+// // 采用了节流函数
+// window.addEventListener('scroll',throttle(loadImg,500,1000));
+</script>
+</html>
