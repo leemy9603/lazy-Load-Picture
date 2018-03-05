@@ -22,9 +22,14 @@ node pic.js启动node服务器
 
 
 #前端
+
 ajax请求
+
 npm install http-server -g
+
 http-server -p 3001
+
 在浏览器访问localhost:3001
+
 
 
